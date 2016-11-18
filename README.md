@@ -11,3 +11,5 @@
 
 ## Notebook Examples
 [North Atlantic Weather Regimes](examples/North_Atlantic_weather_regimes.ipynb)
+
+![NA_weather_regimes](examples/NA_weather_regimes.png)
