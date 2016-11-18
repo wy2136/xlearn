@@ -10,3 +10,4 @@
     m = KMeans(n_clusters=4, random_state=0).fit(da)
 
 ## Notebook Examples
+[North Atlantic Weather Regimes](examples/North_Atlantic_weather_regimes.ipynb)
