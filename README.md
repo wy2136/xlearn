@@ -1,4 +1,4 @@
-# xlearn: xarray-aware sciki-learn
+# xlearn: xarray-aware scikit-learn
 
 ## Example
 
