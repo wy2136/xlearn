@@ -1,11 +1,11 @@
 '''author: Wenchang Yang (yang.wenchang@uci.edu)'''
 
 import xarray as xr
-from sklearn.cluster import KMeans as KMeans_base
+from sklearn.cluster import KMeans as KMeans_sklearn
 import numpy as np
 import matplotlib.pyplot as plt
 
-class KMeans(KMeans_base):
+class KMeans(KMeans_sklearn):
     '''Inherit from sklearn.cluster.KMeans that accept xarray.DataArray data
     to fit.'''
 
