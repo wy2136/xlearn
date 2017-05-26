@@ -49,11 +49,11 @@ class LinearRegression(LinearRegression_sklearn):
                 X = X[:, np.newaxis]
             if self.normalize_x:
                 X = ( X - X.mean(axis=0, keepdims=True))/X.std(axis=0, keepdims=True)
-            
+
             Y = np.array(da_Y)
             if self.normalize_y:
                 Y = ( Y - Y.mean(axis=0, keepdims=True))/Y.std(axis=0, keepdims=True)
-            
+
             return super().fit(X, Y)
 
         # input data parameters
@@ -78,20 +78,20 @@ class LinearRegression(LinearRegression_sklearn):
 
         # reshape da_Y from n-d to 2-d
         Y = Y.reshape((n_samples, n_grids))
-        valid_grids = ~np.isnan(Y[0, :])
+        valid_grids = ~np.isnan(Y.sum(axis=0))
         Y = Y[:, valid_grids]
         if self.normalize_y:
             Y = ( Y - Y.mean(axis=0, keepdims=True))/Y.std(axis=0, keepdims=True)
-        
-        
+
+
         # call the sklearn version model
         super().fit(X, Y)
-        
+
         # reshape the coefficient array back
         b = np.empty((n_grids, n_features)) * np.nan
         b[valid_grids, :] = self.coef_
         b = b.reshape(grid_shape + (n_features,))
-        
+
         # wrap regression coefficient into DataArray
         if da_Y_is_1d:
             grid_dims = ('grid',)
@@ -102,23 +102,23 @@ class LinearRegression(LinearRegression_sklearn):
         else:
             feature_dim = da_X.dims[1]
         coef_dims = grid_dims + (feature_dim,)
-        
+
         if da_X_is_1d:
             coef_coords = {feature_dim: np.array([0])}
         else:
             coef_coords = {feature_dim: da_X[feature_dim]}
-        if da_Y_is_1d: 
+        if da_Y_is_1d:
             coef_coords[grid_dims[0]] = np.array([0])
         else:
             for dim in grid_dims:
                 coef_coords[dim] = da_Y[dim]
-                
+
         self.coef_da = xr.DataArray(b, dims=coef_dims, coords=coef_coords)
         if da_X_is_1d:
             self.coef_da = self.coef_da.sel(feature=0)
         if da_Y_is_1d:
             self.coef_da = self.coef_da.sel(grid=0)
-        
+
         # add-on estimate: p_value
         p = np.empty( (n_grids, n_features) ) * np.nan
         sse = np.sum( (self.predict(X) - Y)**2, axis=0 )[:, np.newaxis]
@@ -134,7 +134,7 @@ class LinearRegression(LinearRegression_sklearn):
             self.pvalue_da = self.pvalue_da.sel(feature=0)
         if da_Y_is_1d:
             self.pvalue_da = self.pvalue_da.sel(grid=0)
-        
+
         # add-on: intercept
         b0 = np.empty((n_grids,)) * np.nan
         b0[valid_grids] = self.intercept_
@@ -146,10 +146,10 @@ class LinearRegression(LinearRegression_sklearn):
         else:
             for dim in grid_dims:
                 intercept_coords[dim] = da_Y[dim]
-            
+
         self.intercept_da = xr.DataArray(b0, dims=intercept_dims,
             coords=intercept_coords)
         if da_Y_is_1d:
             self.intercept_da = self.intercept_da.sel(grid=0)
-        
+
         return self
