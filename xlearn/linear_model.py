@@ -78,10 +78,10 @@ class LinearRegression(LinearRegression_sklearn):
 
         # reshape da_Y from n-d to 2-d
         Y = Y.reshape((n_samples, n_grids))
-        valid_grids = ~np.isnan(Y.sum(axis=0))
-        Y = Y[:, valid_grids]
         if self.normalize_y:
             Y = ( Y - Y.mean(axis=0, keepdims=True))/Y.std(axis=0, keepdims=True)
+        valid_grids = ~np.isnan(Y.sum(axis=0))
+        Y = Y[:, valid_grids]
 
 
         # call the sklearn version model
